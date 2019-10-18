@@ -14,26 +14,41 @@
 'use strict';
 
 const express = require('express');
-
+const bodyParser = require('body-parser');
+const admin = require('firebase-admin');
 const app = express();
+app.use(bodyParser.json());
 
-// [START hello_world]
-// Say hello!
-// app.get('/', (req, res) => {
-//   res.status(200).send('Hello, world!');
-// });
+const serviceAccount = require("./secret/sevice-key.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://firechat-256210.firebaseio.com"
+});
+
+app.post('/token', (req, res) => {
+    console.log(req.body);
+    const token = req.body.token;
+    admin.auth().verifyIdToken(token)
+        .then(decodedToken => {
+            console.log(decodedToken);
+            res.status(200).send(decodedToken);
+        }).catch(error => {
+            console.error(error);
+        });
+});
 
 app.use(express.static('public'));
 // [END hello_world]
 
 if (module === require.main) {
-  // [START server]
-  // Start the server
-  const server = app.listen(process.env.PORT || 8080, () => {
-    const port = server.address().port;
-    console.log(`App listening on port ${port}`);
-  });
-  // [END server]
+    // [START server]
+    // Start the server
+    const server = app.listen(process.env.PORT || 8080, () => {
+        const port = server.address().port;
+        console.log(`App listening on port ${port}`);
+    });
+    // [END server]
 }
 
 module.exports = app;
