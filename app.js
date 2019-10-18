@@ -23,7 +23,7 @@ const app = express();
 //   res.status(200).send('Hello, world!');
 // });
 
-app.use('/', express.static('/public'));
+app.use(express.static('public'));
 // [END hello_world]
 
 if (module === require.main) {
