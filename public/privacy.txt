@@ -1,0 +1,3 @@
+We don't collect nor store your data.
+This app only displays your own data back.
+No one else sees it.
