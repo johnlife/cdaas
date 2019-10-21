@@ -79,18 +79,32 @@ function authStateObserver(user) {
         userNameElement.removeAttribute('hidden');
         userPicElement.removeAttribute('hidden');
         signOutButtonElement.removeAttribute('hidden');
+        detailsContainerElement.removeAttribute('hidden');
 
-        // Hide sign-in button.
-        signInButtonElement.setAttribute('hidden', 'true');
-
+        signInUiElement.setAttribute('hidden', 'true');
+        ui.reset();
     } else { // User is signed out!
         // Hide user's profile and sign-out button.
         userNameElement.setAttribute('hidden', 'true');
         userPicElement.setAttribute('hidden', 'true');
         signOutButtonElement.setAttribute('hidden', 'true');
+        detailsContainerElement.setAttribute('hidden', 'true');
 
         // Show sign-in button.
-        signInButtonElement.removeAttribute('hidden');
+        signInUiElement.removeAttribute('hidden');
+        ui.start('#firebaseui-auth-container', {
+            signInFlow: 'popup',
+            signInOptions: [
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+                firebase.auth.GithubAuthProvider.PROVIDER_ID,
+            ],
+            callbacks: {
+                signInSuccess: (currentUser, credential, redirectUrl) => {
+                    return false
+                },
+            }
+        });
     }
 }
 
@@ -132,15 +146,16 @@ checkSetup();
 
 // Shortcuts to DOM Elements.
 const detailsElement = document.getElementById('details');
+const detailsContainerElement = document.getElementById('messages-card');
 const userPicElement = document.getElementById('user-pic');
 const userNameElement = document.getElementById('user-name');
-const signInButtonElement = document.getElementById('sign-in');
 const signOutButtonElement = document.getElementById('sign-out');
 const signInSnackbarElement = document.getElementById('must-signin-snackbar');
+const signInUiElement = document.getElementById('firebaseui-auth-container');
 
 // Saves message on form submit.
 signOutButtonElement.addEventListener('click', signOut);
-signInButtonElement.addEventListener('click', signIn);
 
 // initialize Firebase
 initFirebaseAuth();
+var ui = new firebaseui.auth.AuthUI(firebase.auth());
